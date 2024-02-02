@@ -10,11 +10,67 @@ Entregar: Fuentes y documento PDF con las respuestas.
 **Parte I Hilos Java**
 
 1. De acuerdo con lo revisado en las lecturas, complete las clases CountThread, para que las mismas definan el ciclo de vida de un hilo que imprima por pantalla los números entre A y B.
+
+```
+public class CountThread extends Thread{
+    private final int in;
+    private final int out;
+
+    public CountThread(int in, int out){
+        this.in = in;
+        this.out = out;
+    }
+
+    @Override
+    public void run(){
+        for(int i = in; i <= out; i++){
+            System.out.println(i);
+        }
+    }
+}
+```
+
+
 2. Complete el método __main__ de la clase CountMainThreads para que:
 	1. Cree 3 hilos de tipo CountThread, asignándole al primero el intervalo [0..99], al segundo [99..199], y al tercero [200..299].
+
+	```
+    public static void main(String a[]){
+        CountThread T1 = new CountThread(0,99);
+        CountThread T2 = new CountThread(100,199);
+        CountThread T3 = new CountThread(200,299);
+
+    }
+    
+	```
+
 	2. Inicie los tres hilos con 'start()'.
+
+	```
+	public static void main(String a[]){
+        CountThread T1 = new CountThread(0,99);
+        CountThread T2 = new CountThread(100,199);
+        CountThread T3 = new CountThread(200,299);
+
+        T1.start();
+        T2.start();
+        T3.start();
+    }
+	```
 	3. Ejecute y revise la salida por pantalla. 
 	4. Cambie el incio con 'start()' por 'run()'. Cómo cambia la salida?, por qué?.
+
+	```
+	public static void main(String a[]){
+        CountThread T1 = new CountThread(0,99);
+        CountThread T2 = new CountThread(100,199);
+        CountThread T3 = new CountThread(200,299);
+
+        T1.run();
+        T2.run();
+        T3.run();
+    }
+	```
 
 **Parte II Hilos Java**
 
@@ -23,7 +79,36 @@ La fórmula [BBP](https://en.wikipedia.org/wiki/Bailey%E2%80%93Borwein%E2%80%93P
 Para este ejercicio se quiere calcular, en el menor tiempo posible, y en una sola máquina (aprovechando las características multi-core de la mismas) al menos el primer millón de dígitos de PI (en base 16). Para esto
 
 1. Cree una clase de tipo Thread que represente el ciclo de vida de un hilo que calcule una parte de los dígitos requeridos.
+
+```
+public class ThreadCalculate extends Thread {
+    private final int start;
+    private final int last;
+    private String thread;
+    private String result;
+
+    public ThreadCalculate(String NameOfThread, int a, int b) {
+        this.start = a;
+        this.last = b;
+        this.thread = NameOfThread;
+    }
+
+    @Override
+    public void run(){
+        //Start an empty array where we're going to store the process's digits
+        byte[] digits;
+        //Invoke the function which obtains the digits of the proccess specifying the range of numbers
+        digits = PiDigits.getDigits(start, last);
+        //The local variable is going to store the Hexadecimal equivalency
+        this.result = PiDigits.bytesToHex(digits);
+    }
+}
+```
 2. Haga que la función PiDigits.getDigits() reciba como parámetro adicional un valor N, correspondiente al número de hilos entre los que se va a paralelizar la solución. Haga que dicha función espere hasta que los N hilos terminen de resolver el problema para combinar las respuestas y entonces retornar el resultado. Para esto, revise el método [join](https://docs.oracle.com/javase/tutorial/essential/concurrency/join.html) del API de concurrencia de Java.
+
+**Solución**
+Para realizar este ejercicio utilizamos la clase __PiDigits__ como orquestador, enviandole al constructor el parámetro N que indica la cantidad de hilos que debe utilizar el programa y así creamos un método aparte __(Orchestor())__ el cual se encarga de crear todos los hilos y arrancarlos así obteniendo y retornando el resultado esperado.
+
 3. Ajuste las pruebas de JUnit, considerando los casos de usar 1, 2 o 3 hilos (este último para considerar un número impar de hilos!)
 
 

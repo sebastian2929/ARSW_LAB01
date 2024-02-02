@@ -1,5 +1,9 @@
 package edu.eci.arsw.math;
 
+import java.util.ArrayList;
+
+import edu.eci.arsw.threads.ThreadCalculate;
+
 ///  <summary>
 ///  An implementation of the Bailey-Borwein-Plouffe formula for calculating hexadecimal
 ///  digits of pi.
@@ -10,7 +14,29 @@ public class PiDigits {
 
     private static int DigitsPerSum = 8;
     private static double Epsilon = 1e-17;
+    private int N = 0;
+    private int digits;
+    private final int[] EachThread;
+    private ArrayList<String> resultsHex = new ArrayList<String>();
+    private int start;
 
+
+    public PiDigits(int start,int digits,int N){
+        this.N = N;
+        this.start = start;
+        this.digits = (digits-start);
+        this.EachThread = new int[N];
+        int pair = this.digits / N;
+        int odd = this.digits % N ;
+        for(int i = 0; i < N; i++){
+            if(i+1 == N){
+                this.EachThread[i]=pair+odd;
+            }else{
+                this.EachThread[i]=pair;
+            }
+        }
+        
+    }
     
     /**
      * Returns a range of hexadecimal digits of pi.
@@ -108,6 +134,49 @@ public class PiDigits {
         }
 
         return result;
+    }
+
+    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        StringBuilder sb=new StringBuilder();
+        for (int i=0;i<hexChars.length;i=i+2){
+            //sb.append(hexChars[i]);
+            sb.append(hexChars[i+1]);            
+        }
+        return sb.toString();
+    }
+
+    //Thread's Orchestor , starts each thread and returns the hexadecimal result
+    public String Orchestor() throws InterruptedException{
+        ThreadCalculate threads[] = new ThreadCalculate[N];
+        String result = "";
+        for (int thread=0; thread<N ; thread++){
+            System.out.println(Integer.toString(thread+1));
+            Integer inicio = (thread * (this.digits/N)) + start;
+            System.out.println("EsteSiEsElinicioPa" + Integer.toString(inicio));
+            System.out.println("Estaeslacantidaddedigitospa : " + Integer.toString(this.EachThread[thread]));
+            System.out.println("Finalmente : " + Integer.toString(inicio + (this.EachThread[thread])));
+            threads[thread] = new ThreadCalculate(Integer.toString(thread+1),inicio,(int)this.EachThread[thread]);
+            threads[thread].start();
+
+            threads[thread].join();
+            String toHex = threads[thread].getResult();
+            this.resultsHex.add(toHex);
+            System.out.println("Thread number: "+threads[thread].getNameOfThread()+" : "+toHex);
+            result = result + toHex;
+
+        }
+
+        System.out.println(result);
+
+        return result;
+
     }
 
 }

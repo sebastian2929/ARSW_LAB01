@@ -5,10 +5,19 @@
  */
 package edu.eci.arsw.threads;
 
-/**
- *
- * @author hcadavid
- */
-public class CountThread {
-    
+public class CountThread extends Thread{
+    private final int in;
+    private final int out;
+
+    public CountThread(int in, int out){
+        this.in = in;
+        this.out = out;
+    }
+
+    @Override
+    public void run(){
+        for(int i = in; i <= out; i++){
+            System.out.println(i);
+        }
+    }
 }

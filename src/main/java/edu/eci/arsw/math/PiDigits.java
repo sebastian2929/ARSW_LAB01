@@ -179,4 +179,8 @@ public class PiDigits {
 
     }
 
+    public int ThreadsAmount() {
+        return N;
+    }
+
 }
